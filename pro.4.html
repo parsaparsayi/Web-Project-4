@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧠 Visual Message Encryptor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top left, #5c7ae6, #ff480a, #ff480a);
+      color: #eee;
+      padding: 20px;
+      text-align: center;
+    background-size: 200% 200%;
+    }
+    
+    h1 {
+      color: rgb(13, 255, 0);
+    }
+
+    textarea {
+      width: 80%;
+      height: 80px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    #output {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 50px);
+      gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .block {
+      width: 50px;
+      height: 50px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .shape {
+      width: 30px;
+      height: 30px;
+      margin: auto;
+      position: absolute;
+      top: 10px; left: 10px;
+    }
+
+    .circle {
+      border-radius: 50%;
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid;
+      background: none;
+    }
+
+    .decrypt-output {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #0f0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #0ff;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Visual Encryptor & Decryptor</h1>
+
+  <textarea id="inputText" placeholder="Enter your message (A-Z only)..."></textarea><br>
+  <button onclick="encrypt()">Encrypt</button>
+  <button onclick="decrypt()">Decrypt</button>
+
+  <div id="output"></div>
+
+  <div class="decrypt-output" id="decryptedText"></div>
+
+  <script>
+    // رمزگذاری حروف: shape + color
+    const visualMap = {
+      A: { color: 'red', shape: 'square' },
+      B: { color: 'blue', shape: 'circle' },
+      C: { color: 'green', shape: 'triangle' },
+      D: { color: 'yellow', shape: 'square' },
+      E: { color: 'cyan', shape: 'circle' },
+      F: { color: 'magenta', shape: 'triangle' },
+      G: { color: 'orange', shape: 'square' },
+      H: { color: 'lime', shape: 'circle' },
+      I: { color: 'purple', shape: 'triangle' },
+      J: { color: 'teal', shape: 'square' },
+      K: { color: 'pink', shape: 'circle' },
+      L: { color: 'gray', shape: 'triangle' },
+      M: { color: 'maroon', shape: 'square' },
+      N: { color: 'navy', shape: 'circle' },
+      O: { color: 'olive', shape: 'triangle' },
+      P: { color: 'silver', shape: 'square' },
+      Q: { color: 'brown', shape: 'circle' },
+      R: { color: 'gold', shape: 'triangle' },
+      S: { color: 'crimson', shape: 'square' },
+      T: { color: 'indigo', shape: 'circle' },
+      U: { color: 'chartreuse', shape: 'triangle' },
+      V: { color: 'coral', shape: 'square' },
+      W: { color: 'orchid', shape: 'circle' },
+      X: { color: 'steelblue', shape: 'triangle' },
+      Y: { color: 'khaki', shape: 'square' },
+      Z: { color: 'turquoise', shape: 'circle' }
+    };
+
+    const output = document.getElementById('output');
+    const decryptedText = document.getElementById('decryptedText');
+
+    function encrypt() {
+      output.innerHTML = '';
+      decryptedText.innerHTML = '';
+      const text = document.getElementById('inputText').value.toUpperCase().replace(/[^A-Z]/g, '');
+      for (let char of text) {
+        const data = visualMap[char];
+        if (!data) continue;
+
+        const block = document.createElement('div');
+        block.className = 'block';
+        block.dataset.char = char;
+
+        const shape = document.createElement('div');
+        shape.className = `shape ${data.shape === 'circle' ? 'circle' : ''}`;
+        if (data.shape === 'triangle') {
+          shape.className = 'shape triangle';
+          shape.style.borderBottomColor = data.color;
+        } else {
+          shape.style.background = data.color;
+        }
+
+        block.appendChild(shape);
+        output.appendChild(block);
+      }
+    }
+
+    function decrypt() {
+      let text = '';
+      const blocks = output.querySelectorAll('.block');
+      blocks.forEach(block => {
+        const shapeDiv = block.querySelector('.shape');
+        let color, shape;
+        if (shapeDiv.classList.contains('triangle')) {
+          shape = 'triangle';
+          color = shapeDiv.style.borderBottomColor;
+        } else {
+          shape = shapeDiv.classList.contains('circle') ? 'circle' : 'square';
+          color = shapeDiv.style.backgroundColor;
+        }
+
+        // پیدا کردن حرف مربوط به این ویژگی‌ها
+        for (let [key, value] of Object.entries(visualMap)) {
+          const temp = document.createElement("div");
+          temp.style.color = value.color;
+          document.body.appendChild(temp);
+          const realColor = getComputedStyle(temp).color;
+          document.body.removeChild(temp);
+
+          if (shape === value.shape) {
+            const test = document.createElement('div');
+            test.style.color = color;
+            document.body.appendChild(test);
+            const detectedColor = getComputedStyle(test).color;
+            document.body.removeChild(test);
+
+            if (realColor === detectedColor) {
+              text += key;
+              break;
+            }
+          }
+        }
+      });
+
+      decryptedText.innerHTML = `🔓 Decrypted Text: <b>${text}</b>`;
+    }
+  </script>
+</body>
+</html>
